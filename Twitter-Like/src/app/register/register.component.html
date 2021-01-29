@@ -1,0 +1,8 @@
+<div class="register-card">
+  <h1 class="text-center">Register</h1>
+  <label for="editTextName">Name</label>
+  <input type="text" id="editTextName" [(ngModel)]="name" class="form-control">
+  <p class="error-message d-none" id="textErrorMessage">error message</p>
+  <button class="btn btn-primary mx-auto mt-3 d-block" (click)="register(name)">Register</button>
+  <a href="/login" class="btn btn-primary mt-3">Login</a>
+</div>
