@@ -4,7 +4,10 @@ const router = express.Router();
 const userModel = require("./database/models/userModel");
 const tweetModel = require("./database/models/tweetModel");
 
-// create A NEW USER
+/**
+ * Create a new user
+ * need data : {name: "user name"}
+ */
 router.post("/create", async (req, res) => {
   data = req.body;
   // create the schema
@@ -27,11 +30,23 @@ router.get('/getall', async (req, res) => {
 });
 
 // GET ONE USER BY ID
-router.get('/:userId', async (req, res) => {
+router.get('/findById/:userId', async (req, res) => {
   const userId = req.params.userId;
   // find the user
   const user = await userModel.findById(userId);
   // send the result
+  res.status(200).send(user);
+});
+
+
+/**
+ * find a user by its name
+ */
+router.get('/findByName/:name', async (req, res) => {
+  const name = req.params.name;
+  // find the user
+  const user = await userModel.findOne({name});
+  //send the result
   res.status(200).send(user);
 });
 

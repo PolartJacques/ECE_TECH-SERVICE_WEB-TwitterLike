@@ -1,0 +1,33 @@
+#editTextNewTweet {
+  width: 100%;
+  border: none;
+}
+
+#editTextNewTweet:focus {
+  outline: none;
+}
+
+[contenteditable] {
+  font-size: 1.2em;
+}
+
+[contenteditable][placeholder]:empty:before {
+  content: attr(placeholder);
+  position: absolute;
+  color: gray;
+  background-color: transparent;
+}
+
+.btn-tweeter {
+  background-color: rgb(29, 161, 242);
+  color: white;
+  font-weight: bold;
+  padding: .5em 1em;
+  border: none;
+  border-radius: 2em;
+  transition: 0.3s;
+}
+
+.btn-tweeter:hover {
+  background-color:  rgb(26, 139, 209);;
+}
