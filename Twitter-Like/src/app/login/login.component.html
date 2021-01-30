@@ -1,9 +1,10 @@
 <div class="login-card">
   <h1 class="text-center">Login</h1>
-  <label for="editTextName">Name</label>
-  <input type="text" id="editTextName" [(ngModel)]="name" class="form-control">
-  <p class="error-message d-none" id="textErrorMessage">error message</p>
-  <button class="btn btn-primary mx-auto mt-3 d-block" (click)="login(name)">Log In</button>
+  <input type="text" id="editTextName" placeholder="Name" [(ngModel)]="name" class="form-control mt-3">
+  <p class="d-none error-message" id="nameFeedback"></p>
+  <input type="password" placeholder="Password" [(ngModel)]="password" class="form-control mt-3" id="editTextPassword">
+  <p class="d-none error-message" id="passwordFeedback">wrong password</p>
+  <button class="btn btn-primary mx-auto mt-3 d-block" (click)="login(name, password)">Log In</button>
   <div class="row justify-content-end">
     <a href="/register" class="btn btn-primary mt-3 mr-3">Register</a>
   </div>

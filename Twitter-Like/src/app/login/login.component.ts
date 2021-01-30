@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
+import { catchError } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -13,69 +15,90 @@ export class LoginComponent implements OnInit {
 
   // DECLARE VARIABLES
   public name: String;
+  public password: String;
   private editTextName: HTMLElement;
-  private textErrorMessage: HTMLElement;
+  private nameFeedback: HTMLElement;
+  private editTextPassword: HTMLElement;
+  private passwordFeedback: HTMLElement;
 
   constructor(private apiService: ApiService, private userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
     // INIT VARIABLES
     this.name = "";
+    this.password = "";
     this.editTextName = document.getElementById("editTextName");
-    this.textErrorMessage = document.getElementById('textErrorMessage');
+    this.nameFeedback = document.getElementById('nameFeedback');
+    this.editTextPassword = document.getElementById('editTextPassword');
+    this.passwordFeedback = document.getElementById('passwordFeedback');
 
     // ONCLICK
     this.editTextName.onclick = () => {
-      // if form is invalid, reset it
       if(this.editTextName.classList.contains('is-invalid')) {
         this.editTextName.classList.remove('is-invalid');
-        this.textErrorMessage.classList.add('d-none');
+        this.nameFeedback.classList.add('d-none');
         this.name = "";
       }
-    };
+    }
+    this.editTextPassword.onclick = () => {
+      if(this.editTextPassword.classList.contains('is-invalid')) {
+        this.editTextPassword.classList.remove('is-invalid');
+        this.passwordFeedback.classList.add('d-none');
+        this.password = "";
+      }
+    }
   }
 
   /**
    * try to log in an user
    * @param name : the name af the user
+   * @param password : the password
    */
-  public login(name: String) {
+  public login(name: String, password: String) {
+    // check if vorm is valid
     if(this.formIsValid()) {
-      this.apiService.findUserByName(name).subscribe((user: any) => {
-        // check if an user has been founded
-        if(user) {
-          this.userService.name = user.name;
-          this.userService.id = user._id;
-          // redirect to home page
-          this.router.navigate(['/']);
-        } else {
-          this.sendErrorMessage('no user has been founded');
-        }
-      });
+      // try to login
+      this.apiService.login(name, password)
+        .subscribe(
+          // login success
+          res => {
+            console.log(res);
+          },
+          // login fail
+          (err: HttpErrorResponse) => {
+            if(err.status == 401) {
+              // wrong password
+              this.editTextPassword.classList.add('is-invalid');
+              this.passwordFeedback.classList.remove('d-none');
+            }
+            if(err.status == 404) {
+              // user not founded
+              this.editTextName.classList.add('is-invalid');
+              this.nameFeedback.innerHTML = "user not founded";
+              this.nameFeedback.classList.remove('d-none');
+            }
+          }
+        );
     }
   }
 
   /**
-   * check if the form is valid or not
-   * return the propise of a boolean
+   * check if the form is valid
+   * return a boolean
    */
-  public async formIsValid(): Promise<Boolean> {
-    // check if the name field is not emplty
+  public formIsValid(): Boolean {
+    let isValid = true;
     if(this.name == "") {
-      this.sendErrorMessage('enter a name');
-      return false;
+      this.editTextName.classList.add('is-invalid');
+      this.nameFeedback.innerHTML = "enter a name";
+      this.nameFeedback.classList.remove('d-none');
+      isValid = false;
     }
-    return true;
+    if(this.password == "") {
+      this.editTextPassword.classList.add('is-invalid');
+      this.passwordFeedback.classList.remove('d-none');
+      isValid =  false;
+    }
+    return isValid;
   }
-
-  /**
-   * send an erreor messsage from the form
-   * @param message : the error message you want to display
-   */
-  public sendErrorMessage(message: string) {
-    this.textErrorMessage.innerHTML = message;
-    this.textErrorMessage.classList.remove('d-none')
-    this.editTextName.classList.add('is-invalid');
-  }
-
 }
