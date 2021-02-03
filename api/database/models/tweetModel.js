@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
 const TweetSchema = new mongoose.Schema({
-  message: {type: String, required: true},
-  like: {type: Number, required: false, default: 0},
-  retweet: {type: Number, required: false, default: 0}
+  ownerId: {type: String, required: true},
+  message: {type: String, required: true},  // the tweet
+  theRetweet: {type: {userId: String, tweetId: String}, required: false, default: null},  // a retweet (optional)
+  like: {type: Number, required: false, default: 0},  // number of like
+  retweet: {type: Number, required: false, default: 0}  // number of retweet
 }, {
   timestamps: true
 });
