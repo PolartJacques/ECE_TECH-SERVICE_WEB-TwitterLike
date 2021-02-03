@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -12,6 +13,6 @@ app.use(bodyParser.json());
 // add routes
 app.use("/user", user);
 
-app.listen(3000, function() {
+app.listen(process.env.PORT, function() {
   console.log('Twitter like app listening on port 3000!');
 });

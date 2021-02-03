@@ -1,35 +1,61 @@
 const express = require('express');
 const router = express.Router();
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const userModel = require("./database/models/userModel");
-const tweetModel = require("./database/models/tweetModel");
+const jwt = require('jsonwebtoken');
 
 /**
- * Create a new user
- * need data : {name: "user name"}
+ * Register a new user
+ * need data : {name: String, password: String}
  */
-router.post("/create", async (req, res) => {
+router.post("/register", async (req, res) => {
   data = req.body;
-  // create the schema
-  const newUser = new userModel(data);
-  // try to save it in the database
-  try {
-    await newUser.save();
-    res.status(200).send(newUser);
-  } catch (err) {
-    res.status(500).send(err);
+  // hash the password
+  bcrypt.hash(data.password, saltRounds, async (err, hash) => {
+    data.password = hash;
+    // create the schema
+    const newUser = new userModel(data);
+    // try to save it in the database
+    try {
+      await newUser.save();
+      const token = jwt.sign({id: newUser._id}, process.env.ACCESS_TOKEN_SECRET);
+      res.status(200).send({token, id: newUser._id});
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
+});
+
+/**
+ * log in an user
+ * request data : {name: String, password: String}
+ */
+router.post("/login", async (req, res) => {
+  const data = req.body;
+  // try to find the user
+  const user = await userModel.findOne({name: data.name}).select('+password');
+  // check if an user haas been founded
+  if(user) {
+    // check if password match
+    bcrypt.compare(data.password, user.password, (err, same) => {
+      if(same) {
+        // return a json
+        const token = jwt.sign({id: user._id}, process.env.ACCESS_TOKEN_SECRET)
+        res.status(200).send({token, id: user._id});
+      } else {
+        res.status(401).send();
+      }
+    });
+  } else {
+    res.status(404).send();
   }
 });
 
-// GET ALL USER
-router.get('/getall', async (req, res) => {
-  // find all users
-  const users = await userModel.find();
-  // send the result
-  res.status(200).send(users);
-});
-
-// GET ONE USER BY ID
+/**
+ * get one user by id
+ * need to pass the id in the url
+ */
 router.get('/findById/:userId', async (req, res) => {
   const userId = req.params.userId;
   // find the user
@@ -49,35 +75,6 @@ router.get('/findByName/:name', async (req, res) => {
   //send the result
   res.status(200).send(user);
 });
-
-// GET TWEETS OF ONE USER
-router.get('/gettweets/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  //find the user
-  const user = await userModel.findById(userId);
-  // get his tweets
-  const tweets = user.tweet;
-  // send the result
-  res.status(200).send(tweets);
-});
-
-// TWEET SOMETHING
-router.post('/tweet/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const data = req.body;
-  // get the tweet
-  tweet = new tweetModel(data);
-  // get the user, add the tweet, save the user
-  try {
-    const user = await userModel.findById(userId);
-    user.tweet.push(tweet);
-    await user.save();
-    res.status(200).send(tweet);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('internal server error');
-  }
-}); 
 
 // EXPORT
 module.exports = router;

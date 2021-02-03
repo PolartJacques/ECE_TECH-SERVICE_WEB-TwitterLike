@@ -69,8 +69,8 @@ export class RegisterComponent implements OnInit {
       if(formIsValid) {
         // register the new user
         this.ApiService.createUser(name, password).subscribe((res: any) => {
-          this.UserService.name = res.name;
-          this.UserService.id = res._id;
+          // login the user
+          this.UserService.doLogin(name, res.id, res.token);
           // redirect to home page
           this.router.navigate(['/']);
         });
@@ -100,7 +100,7 @@ export class RegisterComponent implements OnInit {
       formValid = false;
     }
     // check if the name is already taken
-    const nameTaken = await new Promise<Boolean>((resolve, reject) => {
+    const nameTaken = await new Promise<Boolean>((resolve) => {
       this.ApiService.findUserByName(this.name).subscribe(res => {
         if(res) {
           this.editTextName.classList.add('is-invalid');

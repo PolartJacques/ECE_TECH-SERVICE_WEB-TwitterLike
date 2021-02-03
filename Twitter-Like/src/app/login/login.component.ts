@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
-import { catchError } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -61,8 +60,9 @@ export class LoginComponent implements OnInit {
       this.apiService.login(name, password)
         .subscribe(
           // login success
-          res => {
-            console.log(res);
+          (res: any) => {
+            // log in the user
+            this.userService.doLogin(name, res.id, res.token);
           },
           // login fail
           (err: HttpErrorResponse) => {
