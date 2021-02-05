@@ -111,18 +111,14 @@ router.post('/tweet', checkToken, (req, res) => {
       .then(() => {
         // update the correspondinf user to add the tweet
         userModel.updateOne({_id: req.token.id}, { $push: {tweets: tweet}})
-          .then((update) => {
+          .then(update => {
             // check if user has been modified
             if(update.nModified == 1) {
               res.status(200).send();
             } else {
               // no user founded
               res.status(404).send();
-            }        
-          })
-          .catch((e) => {
-            console.log(e);
-            res.status(500).send();
+            }
           });
       })
       .catch(e => {
@@ -136,28 +132,70 @@ router.post('/tweet', checkToken, (req, res) => {
 });
 
 /**
- * get one user by id
- * need to pass the id in the url
+ * follow someone
+ * need data: {targetId: id of the user we want to follow}
+ * return (200): succed, (400): bad request
  */
-/*router.get('/findById/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  // find the user
-  const user = await userModel.findById(userId);
-  // send the result
-  res.status(200).send(user);
-});*/
-
+router.put('/follow', checkToken, (req, res) => {
+  try {
+    const data = req.body;
+    // find the user to follow
+    userModel.findById(data.targetId)
+      .then(targetUser => {
+        // check if target user exist
+        if(targetUser) {
+          // add the target user's id to the user's following array
+          userModel.updateOne({_id: req.token.id}, { $addToSet: {following: targetUser._id}})
+            .then(() => {
+              // add user id to the target user's followers array
+              userModel.updateOne({_id: data.targetId}, { $addToSet: {followers: req.token.id}})
+              .then(() => {
+                res.status(200).send();      
+              });
+            });
+        } else {
+          res.status(400).send();
+        }
+      });
+  } catch(e) {
+    console.log('ERROR : /user/follow : ', e);
+    res.status(500).send();
+  }
+});
 
 /**
- * find a user by its name
+ * unfollow someone
+ * need data: {targetId: id of the user we want to follow}
+ * return (200): succed, (400): bad request
  */
-/*router.get('/findByName/:name', async (req, res) => {
-  const name = req.params.name;
-  // find the user
-  const user = await userModel.findOne({name});
-  //send the result
-  res.status(200).send(user);
-});*/
+router.put('/unfollow', checkToken, (req, res) => {
+  try {
+    const data = req.body;
+    // find the user to follow
+    userModel.findById(data.targetId)
+      .then(targetUser => {
+        // check if target user exist
+        if(targetUser) {
+          // remove the target user's id to the user's following array
+          userModel.updateOne({_id: req.token.id}, { $pull: {following: targetUser._id}})
+            .then(() => {
+              // add user id to the target user's followers array
+              userModel.updateOne({_id: data.targetId}, { $pull: {followers: req.token.id}})
+              .then(() => {
+                res.status(200).send();      
+              });
+            });
+        } else {
+          res.status(400).send();
+        }
+      });
+  } catch(e) {
+    console.log('ERROR : /user/follow : ', e);
+    res.status(500).send();
+  }
+});
+
+// METHODES
 
 /**
  * create a json web token
