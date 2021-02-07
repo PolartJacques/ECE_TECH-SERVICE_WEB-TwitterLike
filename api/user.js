@@ -93,8 +93,7 @@ router.post("/login", (req, res) => {
 /**
  * tweet something
  * request data {message: the message to tweet}
- * if it's a retweet, add to the data {retweet: {ownerId: the id of the user who tweeted, tweetId: the tweet id}}
- * return (200): succed, (404): user not founded, (400): bad request
+ * if it's a retweet, add to the data {retweet: the original tweet's id}
  */
 router.post('/tweet', checkToken, (req, res) => {
   try {
@@ -106,24 +105,13 @@ router.post('/tweet', checkToken, (req, res) => {
     } else {
       tweet = new tweetModel({ownerId: req.token.id, message: data.message});
     }
-    // check if the tweet format is valid
-    tweet.validate()
+    // save the tweet
+    tweet.save()
       .then(() => {
-        // update the correspondinf user to add the tweet
-        userModel.updateOne({_id: req.token.id}, { $push: {tweets: tweet}})
-          .then(update => {
-            // check if user has been modified
-            if(update.nModified == 1) {
-              res.status(200).send();
-            } else {
-              // no user founded
-              res.status(404).send();
-            }
-          });
+        res.status(200).send();
       })
       .catch(e => {
-        console.log(e);
-        res.send(400).send();
+        res.status(400).send();
       });
   } catch (e) {
     console.log(e);
@@ -191,6 +179,36 @@ router.put('/unfollow', checkToken, (req, res) => {
       });
   } catch(e) {
     console.log('ERROR : /user/follow : ', e);
+    res.status(500).send();
+  }
+});
+
+/**
+ * return the feed of the current user, limited to 20 tweets
+ * to load more of the feed, pass in the url the number of tweets already loaded
+ */
+router.get('/get/feed/:offset', checkToken, (req, res) => {
+  try {
+    // find the current user following
+    userModel.findById(req.token.id)
+    .select('following')
+      .then(user => {
+        // had itself to the following so we also see our tweets
+        user.following.push(req.token.id);
+        // find tweets of our following
+        tweetModel.find({ownerId: {$in: user.following}})
+          // sort them from more recent to oldest
+          .sort({createdAt: -1})
+          // limit the feed to 20 tweets
+          .skip(parseInt(req.params.offset))
+          .limit(20)
+          .then(feed => {
+            // send the feed
+            res.status(200).send(feed);
+          });
+      });
+  } catch(e) {
+    console.log('ERROR : /user/get/feed : ', e);
     res.status(500).send();
   }
 });
