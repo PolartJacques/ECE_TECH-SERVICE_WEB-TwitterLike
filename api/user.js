@@ -13,12 +13,13 @@ const auth = require('./auth');
  * return: (200){id, token} if succed, (409) if name already taken
  */
 router.post("/register", (req, res) => {
-  try {
-    data = req.body;
+  data = req.body;
+  // check the data
+  if(data.id && data.token) {
     // hash the password
     bcrypt.hash(data.password, saltRounds, (err, hash) => {
       if(err) {
-        console.log(err);
+        console.log('ERROR : /user/register : ', err);
         res.status(500).send();
       } else {
         data.password = hash;
@@ -33,7 +34,6 @@ router.post("/register", (req, res) => {
           .catch((e) => {
             // code 11000 mean duplicate key, so the username is already taken
             if(e.code == 11000) res.status(409).send();
-            // other unhandled error
             else {
               console.log(e);
               res.status(500);
@@ -41,10 +41,7 @@ router.post("/register", (req, res) => {
           });
       }
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send();
-  }
+  } else res.status(400).send();
 });
 
 /**
@@ -53,42 +50,40 @@ router.post("/register", (req, res) => {
  * return (200){token} if succed, (404) if no user founded, (401) if wrong password
  */
 router.post("/login", (req, res) => {
-  try {
-    const data = req.body;
+  const data = req.body;
+  // check the data
+  if(data.name && data.password) {
     // try to find the user
     userModel.findOne({name: data.name}).select('+password')
-      .then(user => {
-        // check if we found the user
-        if(user) {
-          // compare password to hash in database
-          bcrypt.compare(data.password, user.password, (err, same) => {
-            if(err) {
-              console.log(err);
-              res.status(500).send();
+    .then(user => {
+      // check if we found the user
+      if(user) {
+        // compare password to hash in database
+        bcrypt.compare(data.password, user.password, (err, same) => {
+          if(err) {
+            console.log(err);
+            res.status(500).send();
+          } else {
+            // check if the password match
+            if(same) {
+              const token = auth.createToken(user._id);
+              res.status(200).send({token, id: user._id});
             } else {
-              // check if the password match
-              if(same) {
-                const token = auth.createToken(user._id);
-                res.status(200).send({token, id: user._id});
-              } else {
-                // if password don't match send status unauthorized
-                res.status(401).send();
-              }
+              // if password don't match send status unauthorized
+              res.status(401).send();
             }
-          });
-        } else {
-          // if user not found send status not found
-          res.status(404).send();
-        }
-      })
-      .catch(e => {
-        console.log(e);
-        res.status(500).send();
-      });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send();
-  }
+          }
+        });
+      } else {
+        // if user not found send status not found
+        res.status(404).send();
+      }
+    })
+    .catch(e => {
+      console.log(e);
+      res.status(500).send();
+    });
+  } else res.status(400).send();
 });
 
 /**
@@ -97,37 +92,33 @@ router.post("/login", (req, res) => {
  * if it's a retweet, add to the data {retweet: the original tweet's id}
  */
 router.post('/tweet', auth.checkToken, (req, res) => {
-  try {
-    const data = req.body;
+  const data = req.body;
+  // check data
+  if(data.message) {
     let tweet;
     // check if it include a retweeted message to create the tweet
-    if(data.retweet) {
-      tweet = new tweetModel({ownerId: req.token.id, message: data.message, retweet: data.retweet});
-    } else {
-      tweet = new tweetModel({ownerId: req.token.id, message: data.message});
-    }
+    if(data.retweet) tweet = new tweetModel({ownerId: req.token.id, message: data.message, retweet: data.retweet});
+    else tweet = new tweetModel({ownerId: req.token.id, message: data.message});
     // save the tweet
     tweet.save()
       .then(() => {
         res.status(200).send();
       })
       .catch(e => {
-        res.status(400).send();
+        console.log('ERROR : /user/tweet : ', e);
+        res.status(500).send();
       });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send();
-  }
+  } else res.status(400).send();
 });
 
 /**
  * follow someone
  * need data: {targetId: id of the user we want to follow}
- * return (200): succed, (400): bad request
  */
 router.put('/follow', auth.checkToken, (req, res) => {
-  try {
-    const data = req.body;
+  const data = req.body;
+  // check data
+  if(data.targetId) {
     // find the user to follow
     userModel.findById(data.targetId)
       .then(targetUser => {
@@ -138,28 +129,21 @@ router.put('/follow', auth.checkToken, (req, res) => {
             .then(() => {
               // add user id to the target user's followers array
               userModel.updateOne({_id: data.targetId}, { $addToSet: {followers: req.token.id}})
-              .then(() => {
-                res.status(200).send();      
-              });
+                .then(() => res.status(200).send());
             });
-        } else {
-          res.status(400).send();
-        }
+        } else res.status(400).send();
       });
-  } catch(e) {
-    console.log('ERROR : /user/follow : ', e);
-    res.status(500).send();
-  }
+  } else res.status(400).send();
 });
 
 /**
  * unfollow someone
  * need data: {targetId: id of the user we want to follow}
- * return (200): succed, (400): bad request
  */
 router.put('/unfollow', auth.checkToken, (req, res) => {
-  try {
-    const data = req.body;
+  const data = req.body;
+  // check data format
+  if(data.targetId) {
     // find the user to follow
     userModel.findById(data.targetId)
       .then(targetUser => {
@@ -170,18 +154,17 @@ router.put('/unfollow', auth.checkToken, (req, res) => {
             .then(() => {
               // add user id to the target user's followers array
               userModel.updateOne({_id: data.targetId}, { $pull: {followers: req.token.id}})
-              .then(() => {
-                res.status(200).send();      
-              });
+              .then(() => res.status(200).send());
             });
         } else {
           res.status(400).send();
         }
+      })
+      .catch(e => {
+        console.log('ERROR : /user/unfollow : ', e);
+        res.status(500).send();
       });
-  } catch(e) {
-    console.log('ERROR : /user/follow : ', e);
-    res.status(500).send();
-  }
+  } else res.status(400).send();
 });
 
 /**
@@ -189,29 +172,28 @@ router.put('/unfollow', auth.checkToken, (req, res) => {
  * to load more of the feed, pass in the url the number of tweets already loaded
  */
 router.get('/get/feed/:offset', auth.checkToken, (req, res) => {
-  try {
-    // find the current user following
-    userModel.findById(req.token.id)
+  // find the current user following
+  userModel.findById(req.token.id)
     .select('following')
-      .then(user => {
-        // had itself to the following so we also see our tweets
-        user.following.push(req.token.id);
-        // find tweets of our following
-        tweetModel.find({ownerId: {$in: user.following}})
-          // sort them from more recent to oldest
-          .sort({createdAt: -1})
-          // limit the feed to 20 tweets
-          .skip(parseInt(req.params.offset))
-          .limit(20)
-          .then(feed => {
-            // send the feed
-            res.status(200).send(feed);
-          });
-      });
-  } catch(e) {
-    console.log('ERROR : /user/get/feed : ', e);
-    res.status(500).send();
-  }
+    .then(user => {
+      // had itself to the following so we also see our tweets
+      user.following.push(req.token.id);
+      // find tweets of our following
+      tweetModel.find({ownerId: {$in: user.following}})
+        // sort them from more recent to oldest
+        .sort({createdAt: -1})
+        // limit the feed to 20 tweets
+        .skip(parseInt(req.params.offset))
+        .limit(20)
+        .then(feed => {
+          // send the feed
+          res.status(200).send(feed);
+        });
+    })
+    .catch(e => {
+      console.log('ERROR : /user/get/feed : ', e);
+      res.status(500).send();
+    });
 });
 
 
