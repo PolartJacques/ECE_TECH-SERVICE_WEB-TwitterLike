@@ -5,6 +5,7 @@ const saltRounds = 10;
 const userModel = require("./database/models/userModel");
 const jwt = require('jsonwebtoken');
 const tweetModel = require('./database/models/tweetModel');
+const auth = require('./auth');
 
 /**
  * Register a new user
@@ -26,7 +27,7 @@ router.post("/register", (req, res) => {
         // try to save it in the database
         newUser.save()
           .then((user) => {
-            const token = createToken(user._id);
+            const token = auth.createToken(user._id);
             res.status(200).send({token, id: newUser._id});
           })
           .catch((e) => {
@@ -67,7 +68,7 @@ router.post("/login", (req, res) => {
             } else {
               // check if the password match
               if(same) {
-                const token = createToken(user._id);
+                const token = auth.createToken(user._id);
                 res.status(200).send({token, id: user._id});
               } else {
                 // if password don't match send status unauthorized
@@ -95,7 +96,7 @@ router.post("/login", (req, res) => {
  * request data {message: the message to tweet}
  * if it's a retweet, add to the data {retweet: the original tweet's id}
  */
-router.post('/tweet', checkToken, (req, res) => {
+router.post('/tweet', auth.checkToken, (req, res) => {
   try {
     const data = req.body;
     let tweet;
@@ -124,7 +125,7 @@ router.post('/tweet', checkToken, (req, res) => {
  * need data: {targetId: id of the user we want to follow}
  * return (200): succed, (400): bad request
  */
-router.put('/follow', checkToken, (req, res) => {
+router.put('/follow', auth.checkToken, (req, res) => {
   try {
     const data = req.body;
     // find the user to follow
@@ -156,7 +157,7 @@ router.put('/follow', checkToken, (req, res) => {
  * need data: {targetId: id of the user we want to follow}
  * return (200): succed, (400): bad request
  */
-router.put('/unfollow', checkToken, (req, res) => {
+router.put('/unfollow', auth.checkToken, (req, res) => {
   try {
     const data = req.body;
     // find the user to follow
@@ -187,7 +188,7 @@ router.put('/unfollow', checkToken, (req, res) => {
  * return the feed of the current user, limited to 20 tweets
  * to load more of the feed, pass in the url the number of tweets already loaded
  */
-router.get('/get/feed/:offset', checkToken, (req, res) => {
+router.get('/get/feed/:offset', auth.checkToken, (req, res) => {
   try {
     // find the current user following
     userModel.findById(req.token.id)
@@ -213,44 +214,7 @@ router.get('/get/feed/:offset', checkToken, (req, res) => {
   }
 });
 
-// METHODES
 
-/**
- * create a json web token
- * @param id : user id
- * return a json web token
- */
-function createToken(id) {
-  const secret = process.env.ACCESS_TOKEN_SECRET;
-  const expiresIn = parseInt(process.env.TOKEN_EXPIRATION);
-  return jwt.sign({id}, secret, {expiresIn});
-}
-
-/**
- * verify the token passed in the header
- * @param req : request
- * @param res : response
- * @param next
- */
-function checkToken(req, res, next) {
-  try {
-    // get back the token
-    const token = req.header('Authorization').split(' ')[1];
-    // verify the token
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decrypted) => {
-      if(err) {
-        // token is not valid
-        res.status(401).send();
-      } else {
-        req.token = decrypted;
-        next();
-      }
-    });
-  } catch(e) {
-    console.log(e);
-    res.status(500).send();
-  }
-}
 
 // EXPORT
 module.exports = router;
