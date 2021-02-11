@@ -6,17 +6,16 @@
 
 .menu {
   flex: 1;
-  border: solid 1px black;
 }
 
 .feed {
   flex: 2;
-  border: solid 1px black;
+  border-left: solid 1px lightgrey;
+  border-right: solid 1px lightgrey;
 }
 
 .search {
   flex: 1;
-  border: solid 1px black;
 }
 
 

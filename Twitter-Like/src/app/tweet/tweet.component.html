@@ -1,6 +1,8 @@
-<div style="border: solid 1 grey;">
-  <p>owner : {{ownerName}}</p>
-  <p>message : {{tweet.message}}</p>
-  <p>like : {{tweet.like}}</p>
-  <p>retweet : {{tweet.retweet}}</p>
+<div class="tweet">
+  <p class="ownerName">{{ownerName}}</p>
+  <p>{{tweet.message}}</p>
+  <div>
+    <button>like {{tweet.like}}</button>
+    <button>retweet {{tweet.retweet}}</button>
+  </div>
 </div>
