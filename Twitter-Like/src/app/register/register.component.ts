@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-register',
@@ -65,24 +66,29 @@ export class RegisterComponent implements OnInit {
    */
   public register(name: String, password: String) {
     // check if the form is valid
-    this.formIsValid().then(formIsValid => {
-      if(formIsValid) {
-        // register the new user
-        this.ApiService.createUser(name, password).subscribe((res: any) => {
-          // login the user
-          this.UserService.doLogin(name, res.id, res.token);
-          // redirect to home page
-          this.router.navigate(['/']);
-        });
-      }
-    });
+    if(this.formIsValid()) {
+      // register the new user
+      this.ApiService.createUser(name, password).subscribe((res: any) => {
+        // login the user
+        this.UserService.doLogin(name, res.id, res.token);
+        // redirect to home page
+        this.router.navigate(['/']);
+      }, (error: HttpErrorResponse) => {
+        if(error.status == 409) {
+          // username taken
+          this.editTextName.classList.add('is-invalid');
+          this.nameFeedback.innerHTML = "name already taken";
+          this.nameFeedback.classList.remove('d-none');
+        }
+      });
+    }
   }
 
   /**
    * check if the form is valid or not
    * return the propise of a boolean
    */
-  public async formIsValid(): Promise<Boolean> {
+  public formIsValid(): Boolean {
     let formValid = true;
     if(this.name == "") {
       this.editTextName.classList.add('is-invalid');
@@ -99,18 +105,6 @@ export class RegisterComponent implements OnInit {
       this.confirmPasswordFeedback.classList.remove('d-none');
       formValid = false;
     }
-    // check if the name is already taken
-    /*const nameTaken = await new Promise<Boolean>((resolve) => {
-      this.ApiService.findUserByName(this.name).subscribe(res => {
-        if(res) {
-          this.editTextName.classList.add('is-invalid');
-          this.nameFeedback.innerHTML = "name already taken";
-          this.nameFeedback.classList.remove('d-none');
-          resolve(false);
-        }
-        resolve(true);
-      });
-    });*/
     return formValid;
   }
 }
