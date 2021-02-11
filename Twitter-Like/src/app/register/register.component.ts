@@ -100,7 +100,7 @@ export class RegisterComponent implements OnInit {
       formValid = false;
     }
     // check if the name is already taken
-    const nameTaken = await new Promise<Boolean>((resolve) => {
+    /*const nameTaken = await new Promise<Boolean>((resolve) => {
       this.ApiService.findUserByName(this.name).subscribe(res => {
         if(res) {
           this.editTextName.classList.add('is-invalid');
@@ -110,7 +110,7 @@ export class RegisterComponent implements OnInit {
         }
         resolve(true);
       });
-    });
-    return (formValid && nameTaken);
+    });*/
+    return formValid;
   }
 }

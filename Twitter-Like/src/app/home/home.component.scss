@@ -1,3 +1,30 @@
+.home {
+  display: flex;
+  width: 1500px;
+  margin: auto;
+}
+
+.menu {
+  flex: 1;
+  border: solid 1px black;
+}
+
+.feed {
+  flex: 2;
+  border: solid 1px black;
+}
+
+.search {
+  flex: 1;
+  border: solid 1px black;
+}
+
+
+
+
+
+
+
 #editTextNewTweet {
   width: 100%;
   border: none;
