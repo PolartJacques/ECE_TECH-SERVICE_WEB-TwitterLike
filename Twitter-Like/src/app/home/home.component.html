@@ -1,30 +1,3 @@
-<!-- <div class="container">
-  <div class="row">
-    <div class="col-3">
-      <ul class="list-group">
-        <li class="list-group-item">Home</li>
-        <li class="list-group-item">Profile</li>
-      </ul>
-    </div>
-    <div class="col-6 p-0 border">
-      <div class="border-bottom">
-        <p class="font-weight-bold m-3" style="font-size: 1.2em;">Accueil</p>
-      </div>
-      <div class="border-bottom p-3">
-        <div contenteditable role="textbox" placeholder="Quoi de neuf ?" id="editTextNewTweet"></div>
-        <hr>
-        <div class="row px-3 justify-content-end">
-          <button class="btn-tweeter">Tweeter</button>
-        </div>
-      </div>
-      <div style="height: 10px; background-color: rgb(247, 249, 250);"></div>
-      <div>
-      </div>
-    </div>
-    <div class="col-3"></div>
-  </div>
-</div> -->
-
 <div class="home">
   <div class="menu">
     <ul>
@@ -33,12 +6,12 @@
     </ul>
   </div>
   <div class="feed">
-    <p>Accueil</p>
-    <div>
+    <p class="header">Accueil</p>
+    <div class="tweet-form">
       <div contenteditable role="textbox" placeholder="Quoi de neuf ?" id="editTextNewTweet"></div>
       <hr>
       <div>
-        <button class="btn-tweeter">Tweeter</button>
+        <button class="btn-tweeter" (click)="tweet()">Tweeter</button>
       </div>
     </div>
     <app-tweet *ngFor="let tweet of getUser().feed" [tweet]="tweet"></app-tweet>

@@ -35,6 +35,16 @@ export class ApiService {
     return this.http.get(this.path + '/user/findBy/id/' + id);
   }
 
+  public tweet(message: String, token: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.post(this.path + '/user/tweet', {message} , httpOptions);
+  }
+
   public checkToken(token: String) {
     const httpOptions = {
       headers: new HttpHeaders({

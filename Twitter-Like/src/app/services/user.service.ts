@@ -69,4 +69,19 @@ export class UserService {
         alert('Something went wrong loading the feed :( \n' + err.status + ' : ' + err.statusText);
       });
   }
+
+  /**
+   * tweet something
+   * @param message : the message to tweet
+   */
+  public tweet(message: String): void {
+    this.apiService.tweet(message, this.getToken())
+      .subscribe((tweet: TweetInterface) => {
+        // success
+        this.feed.unshift(tweet);
+      }, () => {
+        // error
+        alert("something wen't wrong :(");
+      })
+  }
 }
