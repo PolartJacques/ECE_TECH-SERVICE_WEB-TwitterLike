@@ -55,4 +55,15 @@ export class ApiService {
     };
     return this.http.get(this.path + '/checkToken', httpOptions);
   }
+
+  public deleteTweet(token: String, tweetId: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      }),
+      observe: 'response' as 'body'
+    };
+    return this.http.post(this.path + '/tweet/delete', {tweetId}, httpOptions);
+  }
 }
