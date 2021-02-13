@@ -1,0 +1,8 @@
+<div>
+  <input class="search-bar" type="text" [(ngModel)]="searchBarInput">
+  <button (click)="search()">Search</button>
+</div>
+<div *ngFor="let user of usersFounded">
+  <app-user-tag [user]='user'></app-user-tag>
+</div>
+

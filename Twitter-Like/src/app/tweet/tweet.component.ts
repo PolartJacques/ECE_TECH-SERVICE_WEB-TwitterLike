@@ -34,4 +34,18 @@ export class TweetComponent implements OnInit {
         alert(`something went wrong :( \n ${error.status} : ${error.statusText})`);
       });
   }
+
+  public isOurTweet() {
+    return this.tweet.ownerId == this.userService.user._id;
+  }
+
+  public like() {
+    this.apiService.likeTweet(this.userService.getToken(), this.tweet._id).subscribe(() => {
+      if(this.tweet.isLiked) this.tweet.like--;
+      else this.tweet.like++;
+      this.tweet.isLiked = !this.tweet.isLiked;
+    }, (error: HttpErrorResponse) => {
+      alert(`something went wrong :( \n ${error.status} : ${error.statusText}`);
+    });
+  }
 }

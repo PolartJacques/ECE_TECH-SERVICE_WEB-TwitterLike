@@ -1,0 +1,4 @@
+<span>
+  {{user.name}}
+  <button id="btn-follow" *ngIf="!isOurSelf()" (click)="follow()">{{btnFollowText}}</button>
+</span>

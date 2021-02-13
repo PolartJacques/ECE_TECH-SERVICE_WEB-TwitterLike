@@ -3,6 +3,7 @@ import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
 import { HttpErrorResponse } from '@angular/common/http';
+import { UserInterfaceFull } from '../interfaces';
 
 @Component({
   selector: 'app-register',
@@ -68,19 +69,20 @@ export class RegisterComponent implements OnInit {
     // check if the form is valid
     if(this.formIsValid()) {
       // register the new user
-      this.ApiService.createUser(name, password).subscribe((res: any) => {
-        // login the user
-        this.UserService.doLogin(name, res.id, res.token);
-        // redirect to home page
-        this.router.navigate(['/']);
-      }, (error: HttpErrorResponse) => {
-        if(error.status == 409) {
-          // username taken
-          this.editTextName.classList.add('is-invalid');
-          this.nameFeedback.innerHTML = "name already taken";
-          this.nameFeedback.classList.remove('d-none');
-        }
-      });
+      this.ApiService.createUser(name, password)
+        .subscribe((res: {user: UserInterfaceFull, token: string}) => {
+          // login the user
+          this.UserService.doLogin(res.token);
+          // redirect to home page
+          this.router.navigate(['/']);
+        }, (error: HttpErrorResponse) => {
+          if(error.status == 409) {
+            // username taken
+            this.editTextName.classList.add('is-invalid');
+            this.nameFeedback.innerHTML = "name already taken";
+            this.nameFeedback.classList.remove('d-none');
+          }
+        });
     }
   }
 

@@ -50,8 +50,7 @@ export class ApiService {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
         Authorization: 'Bearer ' + token
-      }),
-      observe: 'response' as 'body'
+      })
     };
     return this.http.get(this.path + '/checkToken', httpOptions);
   }
@@ -65,5 +64,49 @@ export class ApiService {
       observe: 'response' as 'body'
     };
     return this.http.post(this.path + '/tweet/delete', {tweetId}, httpOptions);
+  }
+
+  public findUsersByNameLike(name: String) {
+    return this.http.get(this.path + '/user/findBy/nameLike/' + name);
+  }
+
+  public follow(token: String, targetId: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.put(this.path + '/user/follow', {targetId}, httpOptions);
+  }
+
+  public unfollow(token: string, targetId: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.put(this.path + '/user/unfollow', {targetId}, httpOptions);
+  }
+
+  public getUserData(token: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.get(this.path + '/user/get/data', httpOptions);
+  }
+
+  public likeTweet(token: string, tweetId: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.put(this.path + '/tweet/like', {tweetId}, httpOptions);
   }
 }

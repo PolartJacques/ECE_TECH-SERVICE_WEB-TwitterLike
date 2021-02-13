@@ -1,7 +1,8 @@
 import { HttpErrorResponse, HttpResponseBase } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { TweetInterface } from '../interfaces';
+import { error } from 'protractor';
+import { TweetInterface, UserInterfaceFull } from '../interfaces';
 import { ApiService } from './api.service';
 
 const JWT_TOKEN_KEY = "token.jwt";
@@ -12,8 +13,10 @@ const JWT_TOKEN_KEY = "token.jwt";
 
 export class UserService {
 
-  public name: String;
-  private id: String;
+  public user: UserInterfaceFull;
+
+  // public name: String;
+  // private id: String;
   public feed = new Array<TweetInterface>();
 
   constructor(private router: Router, private apiService: ApiService) { }
@@ -24,12 +27,9 @@ export class UserService {
    * @param id : user id
    * @param token : auth token
    */
-  public doLogin(name: String, id: String, token: string) {
+  public doLogin(token: string) {
     // store the token
     sessionStorage.setItem(JWT_TOKEN_KEY, token);
-    // store the user data
-    this.name = name;
-    this.id = id;
     // redirect to the home page
     this.router.navigate(['/']);
   }
@@ -42,9 +42,11 @@ export class UserService {
     const token = this.getToken();
     if(token) {
       return await new Promise<boolean>(resolve => {
-        this.apiService.checkToken(token).subscribe(
-          (res: HttpResponseBase) => resolve(res.status == 200),
-          () => resolve(false))
+        this.apiService.checkToken(token)
+          .subscribe(() => {
+            resolve(true);
+            this.updateUserInfo();
+          }, () => resolve(false));
       });
     }
     return false;
@@ -53,8 +55,19 @@ export class UserService {
   /**
    * return the token of the current user
    */
-  public getToken(): String {
+  public getToken(): string {
     return sessionStorage.getItem(JWT_TOKEN_KEY);
+  }
+
+  /**
+   * get or refresh the user info stored in this service
+   */
+  public updateUserInfo() {
+    this.apiService.getUserData(this.getToken())
+      .subscribe((user: UserInterfaceFull) => {
+        // success
+        this.user = user;
+      }, (error : HttpErrorResponse) => alert(`something went wrong :( \n ${error.status} : ${error.statusText}`));
   }
 
   /**
@@ -64,7 +77,7 @@ export class UserService {
     const offset = this.feed.length;
     this.apiService.getFeed(offset, this.getToken())
       .subscribe((res: Array<TweetInterface>) => {
-        for(let tweet of res) this.feed.push(tweet);
+        this.feed = this.feed.concat(res);
       }, (err: HttpErrorResponse) => {
         alert('Something went wrong loading the feed :( \n' + err.status + ' : ' + err.statusText);
       });

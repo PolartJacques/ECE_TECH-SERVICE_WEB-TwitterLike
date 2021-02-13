@@ -9,6 +9,8 @@ import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './authGuard';
 import { TweetComponent } from './tweet/tweet.component';
+import { SearchUserComponent } from './search-user/search-user.component';
+import { UserTagComponent } from './user-tag/user-tag.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { TweetComponent } from './tweet/tweet.component';
     LoginComponent,
     RegisterComponent,
     HomeComponent,
-    TweetComponent
+    TweetComponent,
+    SearchUserComponent,
+    UserTagComponent
   ],
   imports: [
     BrowserModule,
