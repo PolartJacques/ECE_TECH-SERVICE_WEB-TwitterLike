@@ -31,8 +31,14 @@ export class ApiService {
     return this.http.get(this.path + '/user/get/feed/' + offset, httpOptions);
   }
 
-  public findUserById(id: String) {
-    return this.http.get(this.path + '/user/findBy/id/' + id);
+  public findUserById(token: string, id: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.get(this.path + '/user/findBy/id/' + id, httpOptions);
   }
 
   public tweet(message: String, token: String) {
@@ -114,5 +120,15 @@ export class ApiService {
       })
     };
     return this.http.put(this.path + '/tweet/like', {tweetId}, httpOptions);
+  }
+
+  public getTweetsOfUser(token: string, targetId: String, offset: Number) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.get(this.path + '/user/get/tweets/of/' + targetId + '/' + offset, httpOptions);
   }
 }

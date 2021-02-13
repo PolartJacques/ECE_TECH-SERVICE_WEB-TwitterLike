@@ -11,6 +11,7 @@ import { AuthGuard } from './authGuard';
 import { TweetComponent } from './tweet/tweet.component';
 import { SearchUserComponent } from './search-user/search-user.component';
 import { UserTagComponent } from './user-tag/user-tag.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { UserTagComponent } from './user-tag/user-tag.component';
     HomeComponent,
     TweetComponent,
     SearchUserComponent,
-    UserTagComponent
+    UserTagComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

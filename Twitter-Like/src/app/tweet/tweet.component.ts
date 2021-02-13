@@ -18,7 +18,7 @@ export class TweetComponent implements OnInit {
 
   ngOnInit(): void {
     // find the tweet owner's name
-    this.apiService.findUserById(this.tweet.ownerId)
+    this.apiService.findUserById(this.userService.getToken(), this.tweet.ownerId)
       .subscribe((user: any) => {
         this.ownerName = user.name;
       });
