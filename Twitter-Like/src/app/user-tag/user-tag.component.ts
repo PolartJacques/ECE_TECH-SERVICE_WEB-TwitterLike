@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { UserInterfaceMin } from '../interfaces';
+import { UserInterface } from '../interfaces';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 
@@ -12,21 +12,21 @@ import { UserService } from '../services/user.service';
 export class UserTagComponent implements OnInit {
 
   // DECLARE VARIABLES
-  @Input() user: UserInterfaceMin;
+  @Input() user: UserInterface;
   public btnFollowText = "suivre";
 
   constructor(private userService: UserService, private apiService: ApiService) { }
 
   ngOnInit(): void {
     // addapt button if the user of this tag is allready followed
-    if(this.userService.user.following.includes(this.user._id)) this.btnFollowText = 'desabonner';
+    if(this.user.isFollowed) this.btnFollowText = 'desabonner';
   }
 
   /**
    * follow or unfollow the user of this tag
    */
   public follow() {
-    if(this.userService.user.following.includes(this.user._id)) {
+    if(this.user.isFollowed) {
       this.apiService.unfollow(this.userService.getToken(), this.user._id)
         .subscribe(() => {
           // success

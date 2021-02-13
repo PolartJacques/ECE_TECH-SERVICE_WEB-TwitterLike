@@ -3,7 +3,6 @@ import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
 import { HttpErrorResponse } from '@angular/common/http';
-import { UserInterfaceFull } from '../interfaces';
 
 
 @Component({
@@ -61,7 +60,7 @@ export class LoginComponent implements OnInit {
       this.apiService.login(name, password)
         .subscribe(
           // login success
-          (res: {token: string, user: UserInterfaceFull}) => {
+          (res: {token: string}) => {
             // log in the user
             this.userService.doLogin(res.token);
           },

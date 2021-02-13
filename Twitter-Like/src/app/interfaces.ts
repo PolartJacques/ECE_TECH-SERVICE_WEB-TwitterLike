@@ -9,14 +9,10 @@ export interface TweetInterface {
   createdAt: Date
 }
 
-export interface UserInterfaceMin {
-  _id: String,
-  name: String
-}
-
-export interface UserInterfaceFull {
+export interface UserInterface {
   _id: String,
   name: String,
-  following: Array<String>,
-  followers: Array<String>
+  followers: Number,
+  following: Number,
+  isFollowed: Boolean
 }

@@ -3,7 +3,6 @@ import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
 import {Router} from "@angular/router"
 import { HttpErrorResponse } from '@angular/common/http';
-import { UserInterfaceFull } from '../interfaces';
 
 @Component({
   selector: 'app-register',
@@ -70,7 +69,7 @@ export class RegisterComponent implements OnInit {
     if(this.formIsValid()) {
       // register the new user
       this.ApiService.createUser(name, password)
-        .subscribe((res: {user: UserInterfaceFull, token: string}) => {
+        .subscribe((res: {token: string}) => {
           // login the user
           this.UserService.doLogin(res.token);
           // redirect to home page

@@ -66,8 +66,14 @@ export class ApiService {
     return this.http.post(this.path + '/tweet/delete', {tweetId}, httpOptions);
   }
 
-  public findUsersByNameLike(name: String) {
-    return this.http.get(this.path + '/user/findBy/nameLike/' + name);
+  public findUsersByNameLike(token: string, name: String) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json',
+        Authorization: 'Bearer ' + token
+      })
+    };
+    return this.http.get(this.path + '/user/findBy/nameLike/' + name, httpOptions);
   }
 
   public follow(token: String, targetId: String) {

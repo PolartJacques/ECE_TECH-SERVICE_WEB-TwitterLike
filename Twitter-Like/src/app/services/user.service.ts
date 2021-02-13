@@ -1,8 +1,8 @@
-import { HttpErrorResponse, HttpResponseBase } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { error } from 'protractor';
-import { TweetInterface, UserInterfaceFull } from '../interfaces';
+import { TweetInterface, UserInterface } from '../interfaces';
 import { ApiService } from './api.service';
 
 const JWT_TOKEN_KEY = "token.jwt";
@@ -13,10 +13,7 @@ const JWT_TOKEN_KEY = "token.jwt";
 
 export class UserService {
 
-  public user: UserInterfaceFull;
-
-  // public name: String;
-  // private id: String;
+  public user: UserInterface;
   public feed = new Array<TweetInterface>();
 
   constructor(private router: Router, private apiService: ApiService) { }
@@ -64,7 +61,7 @@ export class UserService {
    */
   public updateUserInfo() {
     this.apiService.getUserData(this.getToken())
-      .subscribe((user: UserInterfaceFull) => {
+      .subscribe((user: UserInterface) => {
         // success
         this.user = user;
       }, (error : HttpErrorResponse) => alert(`something went wrong :( \n ${error.status} : ${error.statusText}`));
