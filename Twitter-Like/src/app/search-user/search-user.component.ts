@@ -20,11 +20,13 @@ export class SearchUserComponent implements OnInit {
   }
 
   public search() {
-    this.apiService.findUsersByNameLike(this.userService.getToken(), this.searchBarInput)
+    if(this.searchBarInput) {
+      this.apiService.findUsersByNameLike(this.userService.getToken(), this.searchBarInput)
       .subscribe((users: UserInterface[]) => {
         // success : save users founded
         this.usersFounded = users;
       }, (error: HttpErrorResponse) => alert(`something went wrong :( \n ${error.status} : ${error.statusText}`));
+    }
   }
 
 }

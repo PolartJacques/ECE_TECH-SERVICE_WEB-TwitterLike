@@ -1,5 +1,6 @@
 <div *ngIf="user$ | async as user">
-  <div>
+  <div  class="user-infos">
+    <button class="btn-logout" (click)="logout()">Logout</button>
     <h2>{{user.name}}</h2>
     <p>followers : {{user.followers}}</p>
     <p>following : {{user.following}}</p>

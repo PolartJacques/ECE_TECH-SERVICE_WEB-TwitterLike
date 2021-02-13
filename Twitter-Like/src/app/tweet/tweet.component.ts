@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TweetInterface } from '../interfaces';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
@@ -14,7 +15,7 @@ export class TweetComponent implements OnInit {
   @Input() tweet: TweetInterface;
   ownerName: String;
 
-  constructor(private apiService: ApiService, private userService: UserService) { }
+  constructor(private apiService: ApiService, private userService: UserService, private router: Router) { }
 
   ngOnInit(): void {
     // find the tweet owner's name
@@ -47,5 +48,9 @@ export class TweetComponent implements OnInit {
     }, (error: HttpErrorResponse) => {
       alert(`something went wrong :( \n ${error.status} : ${error.statusText}`);
     });
+  }
+
+  public goToProfile() {
+    this.router.navigate([`/profile/${this.tweet.ownerId}`]);
   }
 }

@@ -1,6 +1,6 @@
 <div class="tweet">
   <button class="btn-delete" *ngIf="isOurTweet()" (click)="delete()">Delete</button>
-  <p class="ownerName">{{ownerName}}</p>
+  <p (click)="goToProfile()" class="ownerName">{{ownerName}}</p>
   <p>{{tweet.message}}</p>
   <div>
     <button (click)="like()">like {{tweet.like}}</button>

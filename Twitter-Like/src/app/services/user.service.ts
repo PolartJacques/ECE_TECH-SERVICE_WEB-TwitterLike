@@ -32,6 +32,16 @@ export class UserService {
   }
 
   /**
+   * log out the user
+   */
+  public logout() {
+    // store the token
+    sessionStorage.removeItem(JWT_TOKEN_KEY);
+    // redirect to the home page
+    this.router.navigate(['/login']);
+  }
+
+  /**
    * check if the user is loged In
    * check token and it's validity
    */

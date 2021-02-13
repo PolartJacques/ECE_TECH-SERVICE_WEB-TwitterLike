@@ -1,11 +1,11 @@
 <div class="home">
   <div class="menu">
     <ul>
-      <li>Home</li>
-      <li>Profile</li>
+      <li><a routerLink="/">Home</a></li>
+      <li><a (click)="goToMyProfile()">Profile</a></li>
     </ul>
   </div>
-  <div class="feed">
+  <div class="main">
     <router-outlet></router-outlet>
   </div>
   <div class="search">
