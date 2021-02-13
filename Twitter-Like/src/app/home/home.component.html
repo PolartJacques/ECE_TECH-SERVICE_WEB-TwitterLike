@@ -6,15 +6,7 @@
     </ul>
   </div>
   <div class="feed">
-    <p class="header">Accueil</p>
-    <div class="tweet-form">
-      <div contenteditable role="textbox" placeholder="Quoi de neuf ?" id="editTextNewTweet"></div>
-      <hr>
-      <div>
-        <button class="btn-tweeter" (click)="tweet()">Tweeter</button>
-      </div>
-    </div>
-    <app-tweet *ngFor="let tweet of getUser().feed" [tweet]="tweet"></app-tweet>
+    <router-outlet></router-outlet>
   </div>
   <div class="search">
     <app-search-user></app-search-user>

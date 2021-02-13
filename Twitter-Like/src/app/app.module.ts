@@ -12,6 +12,7 @@ import { TweetComponent } from './tweet/tweet.component';
 import { SearchUserComponent } from './search-user/search-user.component';
 import { UserTagComponent } from './user-tag/user-tag.component';
 import { ProfileComponent } from './profile/profile.component';
+import { FeedComponent } from './feed/feed.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ProfileComponent } from './profile/profile.component';
     TweetComponent,
     SearchUserComponent,
     UserTagComponent,
-    ProfileComponent
+    ProfileComponent,
+    FeedComponent
   ],
   imports: [
     BrowserModule,

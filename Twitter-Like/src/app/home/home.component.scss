@@ -12,61 +12,8 @@
   flex: 2;
   border-left: solid 1px lightgrey;
   border-right: solid 1px lightgrey;
-
-  .header {
-    margin: 0, 0;
-    padding: 1em;
-    border-bottom: solid 1px lightgrey;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
-  .tweet-form {
-    margin: 0;
-    padding: 1em 2em;
-    border-bottom: solid 1px lightgrey;
-
-    [contenteditable] {
-      font-size: 1.2em;
-      margin-bottom: 1em;
-      word-break: break-all;
-    }
-  }
 }
 
 .search {
   flex: 1;
-}
-
-.btn-tweeter {
-  background-color: rgb(29, 161, 242);
-  color: white;
-  font-weight: bold;
-  padding: .5em 1em;
-  border: none;
-  border-radius: 2em;
-  transition: 0.3s;
-
-  position: relative;
-  left: 87%;
-}
-
-.btn-tweeter:hover {
-  background-color:  rgb(26, 139, 209);;
-}
-
-#editTextNewTweet {
-  width: 100%;
-  border: none;
-}
-
-#editTextNewTweet:focus {
-  outline: none;
-}
-
-[contenteditable][placeholder]:empty:before {
-  content: attr(placeholder);
-  position: absolute;
-  color: gray;
-  background-color: transparent;
 }
