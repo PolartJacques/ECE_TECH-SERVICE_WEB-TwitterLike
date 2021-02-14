@@ -21,14 +21,8 @@ export class ApiService {
     return this.http.post(this.path + '/user/login', {name, password});
   }
 
-  public getFeed(offset: Number, token: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.get(this.path + '/user/get/feed/' + offset, httpOptions);
+  public getFeed(offset: Number, token: string) {
+    return this.http.get(this.path + '/user/get/feed/' + offset, this.setHeader(token));
   }
 
   public findUserById(token: string, id: String) {
@@ -41,24 +35,12 @@ export class ApiService {
     return this.http.get(this.path + '/user/findBy/id/' + id, httpOptions);
   }
 
-  public tweet(message: String, token: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.post(this.path + '/user/tweet', {message} , httpOptions);
+  public tweet(message: String, token: string) {
+    return this.http.post(this.path + '/user/tweet', {message} , this.setHeader(token));
   }
 
-  public checkToken(token: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.get(this.path + '/checkToken', httpOptions);
+  public checkToken(token: string) {
+    return this.http.get(this.path + '/checkToken', this.setHeader(token));
   }
 
   public deleteTweet(token: String, tweetId: String) {
@@ -73,62 +55,36 @@ export class ApiService {
   }
 
   public findUsersByNameLike(token: string, name: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.get(this.path + '/user/findBy/nameLike/' + name, httpOptions);
+    return this.http.get(this.path + '/user/findBy/nameLike/' + name, this.setHeader(token));
   }
 
-  public follow(token: String, targetId: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.put(this.path + '/user/follow', {targetId}, httpOptions);
+  public follow(token: string, targetId: String) {
+    return this.http.put(this.path + '/user/follow', {targetId}, this.setHeader(token));
   }
 
   public unfollow(token: string, targetId: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.put(this.path + '/user/unfollow', {targetId}, httpOptions);
+    return this.http.put(this.path + '/user/unfollow', {targetId}, this.setHeader(token));
   }
 
-  public getUserData(token: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.get(this.path + '/user/get/data', httpOptions);
+  public getUserData(token: string) {
+    return this.http.get(this.path + '/user/get/data', this.setHeader(token));
   }
 
   public likeTweet(token: string, tweetId: String) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token
-      })
-    };
-    return this.http.put(this.path + '/tweet/like', {tweetId}, httpOptions);
+    return this.http.put(this.path + '/tweet/like', {tweetId}, this.setHeader(token));
   }
 
   public getTweetsOfUser(token: string, targetId: String, offset: Number) {
-    const httpOptions = {
+    return this.http.get(this.path + '/user/get/tweets/of/' + targetId + '/' + offset, this.setHeader(token));
+  }
+
+  // PRIVATES METHODES
+  private setHeader(token: string) {
+    return {
       headers: new HttpHeaders({
         'Content-Type':  'application/json',
         Authorization: 'Bearer ' + token
       })
     };
-    return this.http.get(this.path + '/user/get/tweets/of/' + targetId + '/' + offset, httpOptions);
   }
 }
