@@ -1,8 +1,8 @@
 <div class="tweet">
-  <button class="btn-delete" *ngIf="isOurTweet()" (click)="delete()">Delete</button>
+  <button class="btn-delete btn-tweeter" *ngIf="isOurTweet()" (click)="delete()">Delete</button>
   <p (click)="goToProfile()" class="ownerName">{{ownerName}}</p>
   <p>{{tweet.message}}</p>
   <div>
-    <button (click)="like()">like {{tweet.like}}</button>
+    <button [ngClass]="{'btn-tweeter': tweet.isLiked, 'btn-tweeter-secondary': !tweet.isLiked}" (click)="like()">like {{tweet.like}}</button>
   </div>
 </div>

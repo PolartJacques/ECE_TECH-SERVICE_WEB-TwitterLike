@@ -16,7 +16,13 @@ export class HomeComponent implements OnInit {
   }
 
   public goToMyProfile() {
-    this.router.navigate([`/profile/${this.userService.user._id}`]);
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/profile/' + this.userService.user._id]); // navigate to same route
+    });
+  }
+
+  public goHome() {
+    this.router.navigate(['/']);
   }
 
 }

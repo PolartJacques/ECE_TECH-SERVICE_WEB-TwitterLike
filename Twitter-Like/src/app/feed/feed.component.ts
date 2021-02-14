@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 
 @Component({
@@ -11,13 +12,16 @@ export class FeedComponent implements OnInit {
   // DECLARE VARIABLES
   public EditTextNewTweet: HTMLElement;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
     // INIT VARIABLES
     this.EditTextNewTweet = document.getElementById('editTextNewTweet');
 
-    this.userService.loadFeed();
+    this.activatedRoute.params.subscribe(() => {
+      this.userService.feed = [];
+      this.userService.loadFeed();
+    });
   }
 
   public getUser() {

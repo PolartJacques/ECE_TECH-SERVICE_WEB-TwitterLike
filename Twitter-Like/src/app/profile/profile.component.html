@@ -1,9 +1,14 @@
 <div *ngIf="user$ | async as user">
   <div  class="user-infos">
-    <button class="btn-logout" (click)="logout()">Logout</button>
+    <button class="btn-logout btn-tweeter" *ngIf="isOurself()" (click)="logout()">Logout</button>
+    <button class="btn-follow btn-tweeter" id="btn-follow" *ngIf="!isOurself()" (click)="follow()">{{btnFollowText}}</button>
     <h2>{{user.name}}</h2>
     <p>followers : {{user.followers}}</p>
     <p>following : {{user.following}}</p>
   </div>
   <app-tweet *ngFor="let tweet of tweets" [tweet]="tweet"></app-tweet>
+  <div class="text-center m-5" *ngIf="tweets.length == 0">
+    <h3>No tweets yet !</h3>
+    <p *ngIf="isOurself()">tweet something, say hello to your friends !</p>
+  </div>
 </div>

@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { error } from 'protractor';
 import { TweetInterface, UserInterface } from '../interfaces';
 import { ApiService } from './api.service';
 

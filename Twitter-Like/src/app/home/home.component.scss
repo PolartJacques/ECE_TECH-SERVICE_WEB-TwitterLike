@@ -6,6 +6,27 @@
 
 .menu {
   flex: 1;
+  ul {
+    padding: 2em 0 0 10em;
+  }
+  li {
+    margin: 1em;
+    list-style: none;
+    button {
+      background: none;
+      border: none;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: .5em 1em;
+      border-radius: 2em;
+      display: inline-block;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: rgb(29, 161, 242, 0.1);
+      color: rgb(29, 161, 242);
+    }
+  }
 }
 
 .main {
@@ -16,4 +37,5 @@
 
 .search {
   flex: 1;
+  margin: 1em;
 }
