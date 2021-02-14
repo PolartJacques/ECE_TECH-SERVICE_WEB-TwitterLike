@@ -2,9 +2,7 @@ export interface TweetInterface {
   _id: String,
   message: String,
   ownerId: String,
-  theRetweet: String,
   like: number,
-  retweet: number,
   isLiked: Boolean
   createdAt: Date
 }

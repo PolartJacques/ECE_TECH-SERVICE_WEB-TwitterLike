@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserInterface } from '../interfaces';
 import { ApiService } from '../services/api.service';
 import { UserService } from '../services/user.service';
@@ -15,7 +16,7 @@ export class UserTagComponent implements OnInit {
   @Input() user: UserInterface;
   public btnFollowText = "suivre";
 
-  constructor(private userService: UserService, private apiService: ApiService) { }
+  constructor(private userService: UserService, private apiService: ApiService, private route: Router) { }
 
   ngOnInit(): void {
     // addapt button if the user of this tag is allready followed
@@ -48,6 +49,12 @@ export class UserTagComponent implements OnInit {
    */
   public isOurSelf(): Boolean {
     return this.user._id == this.userService.user._id;
+  }
+
+  public goToProfile() {
+    this.route.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.route.navigate(['/profile/' + this.user._id]); // navigate to same route
+    });
   }
 
 }

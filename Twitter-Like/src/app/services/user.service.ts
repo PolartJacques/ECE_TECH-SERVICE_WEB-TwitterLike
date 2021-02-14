@@ -96,12 +96,6 @@ export class UserService {
    */
   public tweet(message: String): void {
     this.apiService.tweet(message, this.getToken())
-      .subscribe((tweet: TweetInterface) => {
-        // success
-        this.feed.unshift(tweet);
-      }, () => {
-        // error
-        alert("something wen't wrong :(");
-      })
+      .subscribe((tweet: TweetInterface) => this.feed.unshift(tweet));
   }
 }

@@ -1,4 +1,4 @@
 <span>
-  {{user.name}}
+  <span (click)="goToProfile()">{{user.name}}</span>
   <button id="btn-follow" *ngIf="!isOurSelf()" (click)="follow()">{{btnFollowText}}</button>
 </span>
