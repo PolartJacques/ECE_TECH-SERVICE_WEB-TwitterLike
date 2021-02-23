@@ -37,6 +37,8 @@ class Auth {
       res.status(500).send();
     }
   }
+
+  
 }
 
 module.exports = new Auth();

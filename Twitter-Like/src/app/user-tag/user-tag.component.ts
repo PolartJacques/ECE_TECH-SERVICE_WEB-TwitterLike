@@ -42,6 +42,7 @@ export class UserTagComponent implements OnInit {
           this.btnFollowText = 'desabonner';
         }, (error: HttpErrorResponse) => alert(`something went wrong \n ${error.status} : ${error.statusText}`));
     }
+    this.user.isFollowed = !this.user.isFollowed;
   }
 
   /**

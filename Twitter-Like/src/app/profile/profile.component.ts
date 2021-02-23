@@ -79,6 +79,9 @@ export class ProfileComponent implements OnInit {
             this.btnFollowText = 'desabonner';
           }, (error: HttpErrorResponse) => alert(`something went wrong \n ${error.status} : ${error.statusText}`));
       }
+      // update the user
+      user.isFollowed = !user.isFollowed;
+      this.user$ = new Promise<UserInterface>(resolve => resolve(user));
     });
   }
 

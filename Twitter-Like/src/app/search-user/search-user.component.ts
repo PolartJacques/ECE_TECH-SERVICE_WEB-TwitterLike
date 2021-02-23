@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { UserInterface } from '../interfaces';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -14,7 +14,14 @@ export class SearchUserComponent implements OnInit {
   public searchBarInput;
   public usersFounded: UserInterface[];
 
-  constructor(private apiService: ApiService, private userService: UserService) { }
+  // detect clic outside component to close it
+  @HostListener('document:click', ['$event.target'])
+  clickout(target) {
+    const clickedInside = this.elementRef.nativeElement.contains(target);
+    if(!clickedInside) this.usersFounded = null;
+  }
+
+  constructor(private apiService: ApiService, private userService: UserService,private elementRef: ElementRef) { }
 
   ngOnInit(): void {
   }

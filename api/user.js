@@ -3,9 +3,57 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const userModel = require("./database/models/userModel");
-const jwt = require('jsonwebtoken');
 const tweetModel = require('./database/models/tweetModel');
 const auth = require('./auth');
+
+/**
+ * find an user by it's id
+ */
+router.get("/findBy/id/:id", auth.checkToken, (req, res) => {
+  const id = req.params.id;
+  userModel.findById(id)
+    .select('name followers following')
+    .lean()
+    .then(user => {
+      if(user) {
+        // make user match client's user interface
+        user.isFollowed = user.followers.includes(req.token.id);
+        user.followers = user.followers.length;
+        user.following = user.following.length;
+        res.status(200).send(user);
+      } else res.status(404).send();
+    })
+    .catch(err => {
+      console.log("ERROR : /user/findBy/id : ", err);
+      res.status(500).send();
+    });
+});
+
+/**
+ * find a list of user whith a similar name
+ */
+router.get("/findBy/nameLike/:name", auth.checkToken, (req, res) => {
+  const name = req.params.name;
+  userModel.find({name: new RegExp(name, 'i')})
+    .select('-createdAt -updatedAt -__v +followers +following')
+    .lean()
+    .then(users => {
+      if(users) {
+        // adpat user to client user interface
+        users.map(user => {
+          user.isFollowed = user.followers.includes(req.token.id);
+          user.followers = user.followers.length;
+          user.following = user.following.length;
+        });
+        res.status(200).send(users);
+      }
+      else res.status(404).send();
+    })
+    .catch(e => {
+      console.log('ERROR : /user/findBy/name : ', e);
+      res.status(500).send();
+    })
+})
 
 /**
  * Register a new user
@@ -15,7 +63,7 @@ const auth = require('./auth');
 router.post("/register", (req, res) => {
   data = req.body;
   // check the data
-  if(data.id && data.token) {
+  if(data.name && data.password) {
     // hash the password
     bcrypt.hash(data.password, saltRounds, (err, hash) => {
       if(err) {
@@ -29,7 +77,8 @@ router.post("/register", (req, res) => {
         newUser.save()
           .then((user) => {
             const token = auth.createToken(user._id);
-            res.status(200).send({token, id: newUser._id});
+            user.password = undefined;
+            res.status(200).send({token});
           })
           .catch((e) => {
             // code 11000 mean duplicate key, so the username is already taken
@@ -54,7 +103,7 @@ router.post("/login", (req, res) => {
   // check the data
   if(data.name && data.password) {
     // try to find the user
-    userModel.findOne({name: data.name}).select('+password')
+    userModel.findOne({name: data.name}).select('name password followers following')
     .then(user => {
       // check if we found the user
       if(user) {
@@ -67,11 +116,9 @@ router.post("/login", (req, res) => {
             // check if the password match
             if(same) {
               const token = auth.createToken(user._id);
-              res.status(200).send({token, id: user._id});
-            } else {
-              // if password don't match send status unauthorized
-              res.status(401).send();
-            }
+              user.password = undefined;
+              res.status(200).send({token});
+            } else res.status(401).send();
           }
         });
       } else {
@@ -102,7 +149,7 @@ router.post('/tweet', auth.checkToken, (req, res) => {
     // save the tweet
     tweet.save()
       .then(() => {
-        res.status(200).send();
+        res.status(200).send(tweet);
       })
       .catch(e => {
         console.log('ERROR : /user/tweet : ', e);
@@ -179,13 +226,19 @@ router.get('/get/feed/:offset', auth.checkToken, (req, res) => {
       // had itself to the following so we also see our tweets
       user.following.push(req.token.id);
       // find tweets of our following
-      tweetModel.find({ownerId: {$in: user.following}})
+      tweetModel.find({ownerId: {$in: user.following}}).select('-updatedAt -__v')
         // sort them from more recent to oldest
         .sort({createdAt: -1})
         // limit the feed to 20 tweets
         .skip(parseInt(req.params.offset))
         .limit(20)
+        .lean()
         .then(feed => {
+          // transform tweets to match client tweet interface
+          feed.map(tweet => {
+            tweet.isLiked = tweet.like.includes(req.token.id);
+            tweet.like = tweet.like.length;
+          });
           // send the feed
           res.status(200).send(feed);
         });
@@ -193,6 +246,50 @@ router.get('/get/feed/:offset', auth.checkToken, (req, res) => {
     .catch(e => {
       console.log('ERROR : /user/get/feed : ', e);
       res.status(500).send();
+    });
+});
+
+/**
+ * get the data of the current user
+ */
+router.get('/get/data', auth.checkToken, (req, res) => {
+  userModel.findById(req.token.id)
+    .select('name followers following')
+    .lean()
+    .then(user => {
+      // make user match client user interface
+      user.isFollowed = user.followers.includes(req.token.id);
+      user.followers = user.followers.length;
+      user.following = user.following.length;
+      res.status(200).send(user)
+    })
+    .catch(e => {
+      console.log('ERROR : /user/get/data : ', e);
+      res.status(500).send();
+    });
+});
+
+/**
+ * get tweets of an user
+ */
+router.get('/get/tweets/of/:targetId/:offset', auth.checkToken, (req, res) => {
+  const targetId = req.params.targetId;
+  tweetModel.find({ownerId: targetId})
+    .select('-updatedAt -__v')
+    // sort them from more recent to oldest
+    .sort({createdAt: -1})
+    // limit to 20 tweets
+    .skip(parseInt(req.params.offset))
+    .limit(20)
+    .lean()
+    .then(tweets => {
+      // transform tweets to match client tweet interface
+      tweets.map(tweet => {
+        tweet.isLiked = tweet.like.includes(req.token.id);
+        tweet.like = tweet.like.length;
+      });
+      // send the feed
+      res.status(200).send(tweets);
     });
 });
 
